@@ -1,0 +1,926 @@
+<!DOCTYPE html>
+<html lang="zh-CN" class="theme-forest">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>静心眼操 - 动态眼部放松操与护眼空间</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome 图标库 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        eyecare: {
+                            bg: 'var(--bg-color)',
+                            card: 'var(--card-bg)',
+                            text: 'var(--text-color)',
+                            muted: 'var(--text-muted)',
+                            accent: 'var(--accent-color)',
+                            accentLight: 'var(--accent-light)',
+                            border: 'var(--border-color)',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        /* 护眼主题配置 (低饱和度、保护视力) */
+        :root.theme-forest {
+            --bg-color: #f0f4ee;
+            --card-bg: #e2ebd0;
+            --text-color: #233321;
+            --text-muted: #53664f;
+            --accent-color: #4a7243;
+            --accent-light: #7da375;
+            --border-color: #c3d6bf;
+            --glow-color: rgba(74, 114, 67, 0.4);
+        }
+
+        :root.theme-dark {
+            --bg-color: #171a18;
+            --card-bg: #212623;
+            --text-color: #d2ded0;
+            --text-muted: #7f917c;
+            --accent-color: #638c5f;
+            --accent-light: #8cb887;
+            --border-color: #2f3832;
+            --glow-color: rgba(140, 184, 135, 0.4);
+        }
+
+        :root.theme-warm {
+            --bg-color: #f7ede2;
+            --card-bg: #ebd8c3;
+            --text-color: #3d2b1f;
+            --text-muted: #735948;
+            --accent-color: #a0633b;
+            --accent-light: #cc8e64;
+            --border-color: #d9bfd1;
+            --glow-color: rgba(160, 99, 59, 0.4);
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            transition: background-color 0.4s ease, color 0.4s ease;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            line-height: 1.7;
+        }
+
+        .eyecare-card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .eyecare-card-active {
+            border-color: var(--accent-color) !important;
+            box-shadow: 0 0 15px var(--glow-color);
+        }
+
+        /* 自定义 Canvas 包装器，支持光晕与圆角 */
+        .canvas-container {
+            position: relative;
+            background: var(--bg-color);
+            border: 2px solid var(--border-color);
+            border-radius: 1.5rem;
+            overflow: hidden;
+            box-shadow: inset 0 2px 8px rgba(0,0,0,0.05);
+        }
+
+        /* 动画过渡与光晕 */
+        .glow-effect {
+            box-shadow: 0 0 20px var(--glow-color);
+        }
+
+        /* 平滑滚动条 */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: var(--bg-color);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: var(--border-color);
+            border-radius: 3px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--accent-color);
+        }
+
+        /* 原生滑块样式 */
+        input[type=range] {
+            accent-color: var(--accent-color);
+        }
+
+        /* Pulse 呼吸提示 */
+        @keyframes gentlePulse {
+            0%, 100% { transform: scale(1); opacity: 0.9; }
+            50% { transform: scale(1.05); opacity: 1; }
+        }
+        .animate-pulse-gentle {
+            animation: gentlePulse 3s infinite ease-in-out;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between p-4 sm:p-6 md:p-8">
+
+    <!-- 头部导航与主题切换 -->
+    <header class="max-w-6xl mx-auto w-full mb-6 flex flex-col sm:flex-row justify-between items-center gap-4 pb-4 border-b" style="border-color: var(--border-color)">
+        <div class="flex items-center gap-3">
+            <div class="w-11 h-11 rounded-2xl flex items-center justify-center text-xl text-white shadow-sm transition-transform hover:scale-105" style="background-color: var(--accent-color)">
+                <i class="fa-solid fa-eye"></i>
+            </div>
+            <div>
+                <h1 class="text-xl sm:text-2xl font-bold tracking-tight">松眼</h1>
+                <p class="text-xs opacity-75" style="color: var(--text-muted)">科学视线追踪 · 睫状肌舒缓 · 视力保健</p>
+            </div>
+        </div>
+
+        <!-- 主题预设 & 音效控制 -->
+        <div class="flex items-center gap-3">
+            <!-- 声音开关 -->
+            <button onclick="toggleAudio()" id="audio-btn" class="px-3 py-2 rounded-xl text-xs font-semibold flex items-center gap-2 eyecare-card hover:opacity-80 transition" title="开启/关闭和弦提示音">
+                <i class="fa-solid fa-volume-high" id="audio-icon" style="color: var(--accent-color)"></i>
+                <span id="audio-status">提示音: 开</span>
+            </button>
+
+            <!-- 主题切换 -->
+            <div class="flex bg-black/5 dark:bg-white/5 p-1 rounded-xl border" style="border-color: var(--border-color)">
+                <button onclick="setTheme('forest')" class="px-3 py-1.5 rounded-lg text-xs font-medium transition flex items-center gap-1.5" title="森林绿意">
+                    <span class="w-3 h-3 rounded-full" style="background-color: #4a7243"></span> 护眼绿
+                </button>
+                <button onclick="setTheme('warm')" class="px-3 py-1.5 rounded-lg text-xs font-medium transition flex items-center gap-1.5" title="柔和暖橙">
+                    <span class="w-3 h-3 rounded-full" style="background-color: #a0633b"></span> 暖橙
+                </button>
+                <button onclick="setTheme('dark')" class="px-3 py-1.5 rounded-lg text-xs font-medium transition flex items-center gap-1.5" title="夜间模式">
+                    <span class="w-3 h-3 rounded-full" style="background-color: #212623"></span> 暗黑
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- 主体区域 -->
+    <main class="max-w-6xl mx-auto w-full space-y-8 flex-grow">
+
+        <!-- 核心区：画布 & 控制面板 -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+            
+            <!-- 左侧/上方：动态视觉引导 Canvas 视窗 (占 7 列) -->
+            <div class="lg:col-span-7 flex flex-col space-y-4">
+                <div class="canvas-container w-full aspect-[4/3] sm:aspect-[16/10] flex items-center justify-center relative">
+                    <!-- Canvas 画布 -->
+                    <canvas id="exercise-canvas" class="w-full h-full block cursor-crosshair"></canvas>
+
+                    <!-- 全套模式的倒计时浮层 -->
+                    <div id="canvas-overlay-info" class="absolute top-4 left-4 right-4 flex justify-between items-center pointer-events-none px-2">
+                        <span id="current-action-badge" class="px-3 py-1 rounded-full text-xs font-bold text-white shadow-md backdrop-blur-md" style="background-color: var(--accent-color)">
+                            极目远眺
+                        </span>
+                        <span id="action-timer" class="px-3 py-1 rounded-full text-xs font-mono font-bold border backdrop-blur-md" style="background-color: var(--card-bg); border-color: var(--border-color)">
+                            剩余: 15s
+                        </span>
+                    </div>
+
+                    <!-- 动态动作提示文案浮层 -->
+                    <div id="action-instruction" class="absolute bottom-4 left-4 right-4 text-center px-4 py-2 rounded-xl text-xs font-medium backdrop-blur-md border transition-all duration-300" style="background-color: var(--card-bg); border-color: var(--border-color)">
+                        视线保持专注，跟随移动的导引光点平滑移动
+                    </div>
+                </div>
+
+                <!-- 交互控制主面板 -->
+                <div class="eyecare-card p-4 sm:p-5 rounded-2xl flex flex-col sm:flex-row items-center justify-between gap-4">
+                    <!-- 播放/控制按钮 -->
+                    <div class="flex items-center gap-3 w-full sm:w-auto justify-center sm:justify-start">
+                        <button id="main-play-btn" onclick="startFullRoutine()" class="px-5 py-2.5 rounded-xl text-sm font-bold text-white transition shadow-md hover:opacity-90 flex items-center gap-2" style="background-color: var(--accent-color)">
+                            <i class="fa-solid fa-play"></i> 开始全套放松 (1.5分钟)
+                        </button>
+                        <button id="pause-btn" onclick="togglePause()" class="px-4 py-2.5 rounded-xl text-sm font-semibold transition eyecare-card hover:opacity-80 flex items-center gap-1.5" disabled>
+                            <i class="fa-solid fa-pause" id="pause-icon"></i> 暂停
+                        </button>
+                        <button onclick="resetExercise()" class="px-3 py-2.5 rounded-xl text-sm font-medium transition hover:opacity-80 border" style="border-color: var(--border-color)" title="重置">
+                            <i class="fa-solid fa-rotate-left"></i>
+                        </button>
+                    </div>
+
+                    <!-- 速度调节 slider -->
+                    <div class="flex items-center gap-3 w-full sm:w-auto justify-center">
+                        <span class="text-xs font-semibold shrink-0" style="color: var(--text-muted)">移动速度:</span>
+                        <input type="range" id="speed-slider" min="0.5" max="2" step="0.25" value="1" oninput="updateSpeed(this.value)" class="w-28 h-1.5 rounded-lg appearance-none cursor-pointer">
+                        <span id="speed-val" class="text-xs font-mono font-bold w-8">1.0x</span>
+                    </div>
+                </div>
+
+                <!-- 全套练习进度条 -->
+                <div id="full-progress-container" class="w-full bg-black/5 dark:bg-white/5 h-2 rounded-full overflow-hidden hidden">
+                    <div id="full-progress-bar" class="h-full transition-all duration-300 rounded-full" style="width: 0%; background-color: var(--accent-color)"></div>
+                </div>
+            </div>
+
+            <!-- 右侧：动作选择卡片列表 (占 5 列) -->
+            <div class="lg:col-span-5 space-y-3">
+                <div class="flex justify-between items-center mb-1">
+                    <h2 class="text-sm font-bold uppercase tracking-wider opacity-80" style="color: var(--text-muted)">
+                        <i class="fa-solid fa-list-check mr-1" style="color: var(--accent-color)"></i> 动作列表 (点击单独体验)
+                    </h2>
+                    <span class="text-xs opacity-60">共 5 个标准步骤</span>
+                </div>
+
+                <!-- 动作卡片 1 -->
+                <div onclick="selectSingleAction(0)" id="card-0" class="eyecare-card p-3.5 rounded-2xl cursor-pointer hover:scale-[1.01] flex items-center justify-between gap-3 transition">
+                    <div class="flex items-center gap-3">
+                        <div class="w-9 h-9 rounded-xl flex items-center justify-center shrink-0 border" style="border-color: var(--border-color); color: var(--accent-color)">
+                            <i class="fa-solid fa-expand text-sm"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-sm font-bold">1. 极目远眺 (Focus Distant)</h3>
+                            <p class="text-xs opacity-75" style="color: var(--text-muted)">远近聚焦，放松睫状肌痉挛</p>
+                        </div>
+                    </div>
+                    <span class="text-xs font-mono px-2 py-1 rounded-md opacity-70 border" style="border-color: var(--border-color)">15s</span>
+                </div>
+
+                <!-- 动作卡片 2 -->
+                <div onclick="selectSingleAction(1)" id="card-1" class="eyecare-card p-3.5 rounded-2xl cursor-pointer hover:scale-[1.01] flex items-center justify-between gap-3 transition">
+                    <div class="flex items-center gap-3">
+                        <div class="w-9 h-9 rounded-xl flex items-center justify-center shrink-0 border" style="border-color: var(--border-color); color: var(--accent-color)">
+                            <i class="fa-solid fa-circle-notch text-sm"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-sm font-bold">2. 眼球转动 (Eye Rolling)</h3>
+                            <p class="text-xs opacity-75" style="color: var(--text-muted)">顺/逆时针平滑环视，牵拉眼外肌</p>
+                        </div>
+                    </div>
+                    <span class="text-xs font-mono px-2 py-1 rounded-md opacity-70 border" style="border-color: var(--border-color)">20s</span>
+                </div>
+
+                <!-- 动作卡片 3 -->
+                <div onclick="selectSingleAction(2)" id="card-2" class="eyecare-card p-3.5 rounded-2xl cursor-pointer hover:scale-[1.01] flex items-center justify-between gap-3 transition">
+                    <div class="flex items-center gap-3">
+                        <div class="w-9 h-9 rounded-xl flex items-center justify-center shrink-0 border" style="border-color: var(--border-color); color: var(--accent-color)">
+                            <i class="fa-solid fa-infinity text-sm"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-sm font-bold">3. 八字追踪 (Figure-8)</h3>
+                            <p class="text-xs opacity-75" style="color: var(--text-muted)">∞ 轨迹视线移动，提高眼肌协同度</p>
+                        </div>
+                    </div>
+                    <span class="text-xs font-mono px-2 py-1 rounded-md opacity-70 border" style="border-color: var(--border-color)">20s</span>
+                </div>
+
+                <!-- 动作卡片 4 -->
+                <div onclick="selectSingleAction(3)" id="card-3" class="eyecare-card p-3.5 rounded-2xl cursor-pointer hover:scale-[1.01] flex items-center justify-between gap-3 transition">
+                    <div class="flex items-center gap-3">
+                        <div class="w-9 h-9 rounded-xl flex items-center justify-center shrink-0 border" style="border-color: var(--border-color); color: var(--accent-color)">
+                            <i class="fa-solid fa-eye-slash text-sm"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-sm font-bold">4. 眨眼保湿 (Blinking)</h3>
+                            <p class="text-xs opacity-75" style="color: var(--text-muted)">节律性轻柔眨眼，湿润眼球泪膜</p>
+                        </div>
+                    </div>
+                    <span class="text-xs font-mono px-2 py-1 rounded-md opacity-70 border" style="border-color: var(--border-color)">15s</span>
+                </div>
+
+                <!-- 动作卡片 5 -->
+                <div onclick="selectSingleAction(4)" id="card-4" class="eyecare-card p-3.5 rounded-2xl cursor-pointer hover:scale-[1.01] flex items-center justify-between gap-3 transition">
+                    <div class="flex items-center gap-3">
+                        <div class="w-9 h-9 rounded-xl flex items-center justify-center shrink-0 border" style="border-color: var(--border-color); color: var(--accent-color)">
+                            <i class="fa-solid fa-hands text-sm"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-sm font-bold">5. 掌心热敷 (Palming)</h3>
+                            <p class="text-xs opacity-75" style="color: var(--text-muted)">搓热双掌轻覆双眼，沉浸深呼吸</p>
+                        </div>
+                    </div>
+                    <span class="text-xs font-mono px-2 py-1 rounded-md opacity-70 border" style="border-color: var(--border-color)">20s</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- 辅助功能区：20-20-20 定时器与护眼打卡 -->
+        <div class="grid grid-cols-1 md:grid-cols-12 gap-6">
+            
+            <!-- 20-20-20 定时提醒卡片 (占 6 列) -->
+            <div class="md:col-span-6 eyecare-card p-5 sm:p-6 rounded-2xl space-y-4">
+                <div class="flex justify-between items-center">
+                    <div class="flex items-center gap-2">
+                        <i class="fa-regular fa-clock text-lg" style="color: var(--accent-color)"></i>
+                        <h3 class="text-base font-bold">20-20-20 护眼定时提醒</h3>
+                    </div>
+                    <span class="text-xs px-2.5 py-1 rounded-full font-semibold border" style="border-color: var(--border-color); color: var(--accent-color)">
+                        防疲劳神器
+                    </span>
+                </div>
+
+                <p class="text-xs opacity-80" style="color: var(--text-muted)">
+                    国际眼科公认法则：每工作学习 <strong>20分钟</strong>，请抬头远眺 <strong>20英尺 (约6米)</strong> 外的景物至少 <strong>20秒</strong>。
+                </p>
+
+                <div class="flex items-center justify-between pt-2">
+                    <div class="text-2xl font-mono font-bold tracking-wider px-4 py-2 rounded-xl border" style="background-color: var(--bg-color); border-color: var(--border-color)">
+                        <span id="timer-20-display">20:00</span>
+                    </div>
+                    <div class="flex gap-2">
+                        <button id="btn-20-toggle" onclick="toggleTimer20()" class="px-4 py-2 rounded-xl text-xs font-bold text-white transition hover:opacity-90" style="background-color: var(--accent-color)">
+                            开启定时
+                        </button>
+                        <button onclick="resetTimer20()" class="px-3 py-2 rounded-xl text-xs font-medium transition hover:opacity-80 border" style="border-color: var(--border-color)">
+                            重置
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 弹出的休息提示框 -->
+                <div id="rest-alert-20" class="hidden p-3 rounded-xl border text-center animate-pulse-gentle" style="background-color: var(--bg-color); border-color: var(--accent-color)">
+                    <p class="text-xs font-bold" style="color: var(--accent-color)">
+                        <i class="fa-solid fa-bell mr-1"></i> 20分钟到啦！请移开视线远眺窗外 20 秒
+                    </p>
+                </div>
+            </div>
+
+            <!-- 护眼常识与习惯打卡 (占 6 列) -->
+            <div class="md:col-span-6 eyecare-card p-5 sm:p-6 rounded-2xl space-y-4">
+                <div class="flex justify-between items-center">
+                    <div class="flex items-center gap-2">
+                        <i class="fa-solid fa-leaf text-lg" style="color: var(--accent-color)"></i>
+                        <h3 class="text-base font-bold">今日护眼打卡 & 小常识</h3>
+                    </div>
+                    <button onclick="checkInToday()" id="checkin-btn" class="px-3 py-1 rounded-full text-xs font-bold text-white transition hover:opacity-90 shadow-sm" style="background-color: var(--accent-color)">
+                        点击打卡
+                    </button>
+                </div>
+
+                <ul class="text-xs space-y-2 opacity-85" style="color: var(--text-color)">
+                    <li class="flex items-start gap-2">
+                        <i class="fa-solid fa-check text-xs mt-1" style="color: var(--accent-color)"></i>
+                        <span><strong>调整屏幕光线：</strong>屏幕亮度不应高于环境光，避免在强光或纯暗室中使用手机。</span>
+                    </li>
+                    <li class="flex items-start gap-2">
+                        <i class="fa-solid fa-check text-xs mt-1" style="color: var(--accent-color)"></i>
+                        <span><strong>有意识地多眨眼：</strong>专注看屏幕时眨眼频率会骤降60%，多眨眼能防止干眼症。</span>
+                    </li>
+                    <li class="flex items-start gap-2">
+                        <i class="fa-solid fa-check text-xs mt-1" style="color: var(--accent-color)"></i>
+                        <span><strong>保持合适距离：</strong>眼睛与电脑屏幕应保持 50~70 厘米（约一臂长）。</span>
+                    </li>
+                </ul>
+
+                <div class="pt-1 text-xs opacity-75 flex justify-between border-t" style="border-color: var(--border-color); color: var(--text-muted)">
+                    <span>连续打卡天数: <strong id="streak-count" style="color: var(--accent-color)">1</strong> 天</span>
+                    <span>状态: 良好</span>
+                </div>
+            </div>
+
+        </div>
+
+    </main>
+
+    <!-- 页脚 -->
+    <footer class="max-w-6xl mx-auto w-full mt-10 pt-4 border-t text-center text-xs opacity-70" style="border-color: var(--border-color); color: var(--text-muted)">
+        <p>© 2026 松眼 · 科学视觉放松系统 | 界面采用低饱和度护眼配色</p>
+    </footer>
+
+    <!-- JavaScript 全局交互逻辑 -->
+    <script>
+        // --- 1. 全局变量与配置 ---
+        const actionsData = [
+            {
+                name: "1. 极目远眺",
+                duration: 15,
+                type: "distant",
+                instruction: "视线聚焦于导引光点。光点变大代表近聚，变小代表远眺，请随之收缩/放松焦点"
+            },
+            {
+                name: "2. 眼球转动",
+                duration: 20,
+                type: "roll",
+                instruction: "头部保持不动，双眼紧跟圆点沿圆形轨道平滑环视（先顺时针后逆时针）"
+            },
+            {
+                name: "3. 八字追踪",
+                duration: 20,
+                type: "figure8",
+                instruction: "视线平滑追踪 ∞ (8字形) 轨迹移动，充分锻炼眼外肌协同能力"
+            },
+            {
+                name: "4. 眨眼保湿",
+                duration: 15,
+                type: "blink",
+                instruction: "跟随圆点缩放节律：光点闭合时轻闭双眼，光点张开时自然睁开，滋润泪膜"
+            },
+            {
+                name: "5. 掌心热敷",
+                duration: 20,
+                type: "palming",
+                instruction: "双手快速搓热，轻合双眼，掌心轻覆眼眶，感受温热滋养与深呼吸"
+            }
+        ];
+
+        let currentActionIndex = 0;
+        let isFullRoutine = false;
+        let isPlaying = false;
+        let isPaused = false;
+        let speedMultiplier = 1;
+        let remainingTime = actionsData[0].duration;
+        let timerInterval = null;
+        let animFrameId = null;
+        let enableAudio = true;
+
+        // Canvas 相关
+        let canvas, ctx;
+        let animProgress = 0; // 动画累积时间参数
+
+        // --- 2. 主题与 Web Audio 初始化 ---
+        function setTheme(theme) {
+            document.documentElement.className = `theme-${theme}`;
+            localStorage.setItem('eye_theme', theme);
+            // 重绘 Canvas 以响应颜色
+            if (ctx) drawFrame();
+        }
+
+        // Web Audio API 合成音效 (无需依赖外部资源)
+        let audioCtx = null;
+        function initAudio() {
+            if (!audioCtx) {
+                const AudioContext = window.AudioContext || window.webkitAudioContext;
+                if (AudioContext) audioCtx = new AudioContext();
+            }
+        }
+
+        function playHarmonicTone(freq = 440, type = 'sine', duration = 0.8) {
+            if (!enableAudio) return;
+            try {
+                initAudio();
+                if (!audioCtx) return;
+
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+
+                osc.type = type;
+                osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+
+                // 柔和淡入淡出包络
+                gain.gain.setValueAtTime(0, audioCtx.currentTime);
+                gain.gain.linearRampToValueAtTime(0.08, audioCtx.currentTime + 0.1);
+                gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + duration);
+
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+
+                osc.start();
+                osc.stop(audioCtx.currentTime + duration);
+            } catch (e) {
+                // 忽略浏览器自动播放限制错误
+            }
+        }
+
+        function toggleAudio() {
+            enableAudio = !enableAudio;
+            document.getElementById('audio-status').innerText = enableAudio ? "提示音: 开" : "提示音: 关";
+            document.getElementById('audio-icon').className = enableAudio ? "fa-solid fa-volume-high" : "fa-solid fa-volume-xmark";
+        }
+
+        // --- 3. Canvas 核心渲染与追踪导引引擎 (60fps) ---
+        function initCanvas() {
+            canvas = document.getElementById('exercise-canvas');
+            ctx = canvas.getContext('2d');
+            resizeCanvas();
+            window.addEventListener('resize', resizeCanvas);
+        }
+
+        function resizeCanvas() {
+            if (!canvas) return;
+            const rect = canvas.getBoundingClientRect();
+            canvas.width = rect.width * window.devicePixelRatio;
+            canvas.height = rect.height * window.devicePixelRatio;
+            ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
+        }
+
+        function getThemeColors() {
+            const style = getComputedStyle(document.documentElement);
+            return {
+                accent: style.getPropertyValue('--accent-color').trim() || '#4a7243',
+                accentLight: style.getPropertyValue('--accent-light').trim() || '#7da375',
+                border: style.getPropertyValue('--border-color').trim() || '#c3d6bf',
+                text: style.getPropertyValue('--text-color').trim() || '#233321',
+                bg: style.getPropertyValue('--bg-color').trim() || '#f0f4ee'
+            };
+        }
+
+        function drawFrame() {
+            if (!canvas || !ctx) return;
+
+            const width = canvas.getBoundingClientRect().width;
+            const height = canvas.getBoundingClientRect().height;
+            const colors = getThemeColors();
+
+            // 清空画布
+            ctx.clearRect(0, 0, width, height);
+
+            const centerX = width / 2;
+            const centerY = height / 2;
+            const currentAction = actionsData[currentActionIndex];
+
+            // 根据当前动作类型绘制不同动态导引
+            switch (currentAction.type) {
+                case 'distant':
+                    drawDistantGuide(centerX, centerY, colors);
+                    break;
+                case 'roll':
+                    drawRollGuide(centerX, centerY, Math.min(width, height) * 0.32, colors);
+                    break;
+                case 'figure8':
+                    drawFigure8Guide(centerX, centerY, width * 0.35, height * 0.28, colors);
+                    break;
+                case 'blink':
+                    drawBlinkGuide(centerX, centerY, colors);
+                    break;
+                case 'palming':
+                    drawPalmingGuide(centerX, centerY, colors);
+                    break;
+            }
+
+            // 更新累积时间参数（受速度控制）
+            if (isPlaying && !isPaused) {
+                animProgress += 0.015 * speedMultiplier;
+            }
+
+            // 持续动画循环
+            animFrameId = requestAnimationFrame(drawFrame);
+        }
+
+        // 1. 极目远眺绘制 (缩放透视圆环)
+        function drawDistantGuide(cx, cy, colors) {
+            const scale = (Math.sin(animProgress * 1.5) + 1) / 2; // 0 ~ 1 循环
+            const maxRadius = 110;
+            const minRadius = 15;
+            const radius = minRadius + scale * (maxRadius - minRadius);
+
+            // 绘制辅助波纹
+            ctx.beginPath();
+            ctx.arc(cx, cy, maxRadius, 0, Math.PI * 2);
+            ctx.strokeStyle = colors.border;
+            ctx.lineWidth = 1.5;
+            ctx.setLineDash([4, 4]);
+            ctx.stroke();
+            ctx.setLineDash([]);
+
+            // 核心导引光圈
+            ctx.beginPath();
+            ctx.arc(cx, cy, radius, 0, Math.PI * 2);
+            ctx.fillStyle = colors.accentLight + '33'; // 柔和半透明
+            ctx.fill();
+            ctx.strokeStyle = colors.accent;
+            ctx.lineWidth = 3;
+            ctx.stroke();
+
+            // 中心焦点点
+            ctx.beginPath();
+            ctx.arc(cx, cy, 6, 0, Math.PI * 2);
+            ctx.fillStyle = colors.accent;
+            ctx.fill();
+
+            // 文字提示（远/近）
+            ctx.fillStyle = colors.text;
+            ctx.font = '12px sans-serif';
+            ctx.textAlign = 'center';
+            ctx.fillText(scale > 0.5 ? "【聚焦近处】" : "【远眺深处】", cx, cy + maxRadius + 25);
+        }
+
+        // 2. 眼球转动绘制 (平滑圆周运动)
+        function drawRollGuide(cx, cy, radius, colors) {
+            // 绘制圆形轨迹线
+            ctx.beginPath();
+            ctx.arc(cx, cy, radius, 0, Math.PI * 2);
+            ctx.strokeStyle = colors.border;
+            ctx.lineWidth = 2;
+            ctx.stroke();
+
+            // 计算当前点坐标
+            const angle = animProgress * 1.2;
+            const x = cx + Math.cos(angle) * radius;
+            const y = cy + Math.sin(angle) * radius;
+
+            // 导引发光圆点
+            drawGlowingDot(x, y, 12, colors.accent);
+        }
+
+        // 3. 八字追踪绘制 (双纽线/Infinity 轨迹)
+        function drawFigure8Guide(cx, cy, scaleX, scaleY, colors) {
+            // 绘制 ∞ 静态轨迹线
+            ctx.beginPath();
+            for (let t = 0; t <= Math.PI * 2; t += 0.02) {
+                const denom = 1 + Math.sin(t) * Math.sin(t);
+                const x = cx + (scaleX * Math.cos(t)) / denom;
+                const y = cy + (scaleY * Math.sin(t) * Math.cos(t)) / denom;
+                if (t === 0) ctx.moveTo(x, y);
+                else ctx.lineTo(x, y);
+            }
+            ctx.strokeStyle = colors.border;
+            ctx.lineWidth = 2;
+            ctx.stroke();
+
+            // 计算当前点
+            const t = animProgress * 1.2;
+            const denom = 1 + Math.sin(t) * Math.sin(t);
+            const x = cx + (scaleX * Math.cos(t)) / denom;
+            const y = cy + (scaleY * Math.sin(t) * Math.cos(t)) / denom;
+
+            // 导引发光圆点
+            drawGlowingDot(x, y, 12, colors.accent);
+        }
+
+        // 4. 眨眼保湿绘制 (眼睛张合动画)
+        function drawBlinkGuide(cx, cy, colors) {
+            const blinkFactor = (Math.sin(animProgress * 2.5) + 1) / 2; // 0(闭合) ~ 1(睁开)
+            const eyeWidth = 100;
+            const eyeHeight = 50 * blinkFactor;
+
+            // 绘制外眼廓
+            ctx.beginPath();
+            ctx.ellipse(cx, cy, eyeWidth, Math.max(2, eyeHeight), 0, 0, Math.PI * 2);
+            ctx.strokeStyle = colors.accent;
+            ctx.lineWidth = 3;
+            ctx.stroke();
+
+            if (eyeHeight > 8) {
+                // 瞳孔
+                ctx.beginPath();
+                ctx.arc(cx, cy, 20 * blinkFactor, 0, Math.PI * 2);
+                ctx.fillStyle = colors.accent;
+                ctx.fill();
+            }
+
+            // 提示文案
+            ctx.fillStyle = colors.text;
+            ctx.font = '13px sans-serif';
+            ctx.textAlign = 'center';
+            ctx.fillText(blinkFactor < 0.2 ? "轻轻闭眼..." : "自然睁眼...", cx, cy + 80);
+        }
+
+        // 5. 掌心热敷绘制 (温热波纹动画)
+        function drawPalmingGuide(cx, cy, colors) {
+            const rippleCount = 3;
+            for (let i = 0; i < rippleCount; i++) {
+                const r = ((animProgress * 30 + i * 40) % 120);
+                const alpha = Math.max(0, 1 - r / 120);
+                ctx.beginPath();
+                ctx.arc(cx, cy, r, 0, Math.PI * 2);
+                ctx.strokeStyle = colors.accentLight;
+                ctx.lineWidth = 2;
+                ctx.globalAlpha = alpha;
+                ctx.stroke();
+                ctx.globalAlpha = 1.0;
+            }
+
+            // 中央发光核心
+            ctx.beginPath();
+            ctx.arc(cx, cy, 30, 0, Math.PI * 2);
+            ctx.fillStyle = colors.accent + 'aa';
+            ctx.fill();
+
+            ctx.fillStyle = '#ffffff';
+            ctx.font = '20px FontAwesome';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText('\uF2B5', cx, cy); // 掌心图标
+            ctx.textBaseline = 'alphabetic';
+        }
+
+        // 通用发光点绘制
+        function drawGlowingDot(x, y, radius, color) {
+            // 外层光晕
+            ctx.beginPath();
+            ctx.arc(x, y, radius * 1.8, 0, Math.PI * 2);
+            ctx.fillStyle = color + '44';
+            ctx.fill();
+
+            // 内层实心点
+            ctx.beginPath();
+            ctx.arc(x, y, radius, 0, Math.PI * 2);
+            ctx.fillStyle = color;
+            ctx.fill();
+        }
+
+        // --- 4. 交互逻辑与定时器控制 ---
+        function updateActionUI() {
+            const current = actionsData[currentActionIndex];
+            document.getElementById('current-action-badge').innerText = current.name;
+            document.getElementById('action-instruction').innerText = current.instruction;
+            document.getElementById('action-timer').innerText = `剩余: ${remainingTime}s`;
+
+            // 更新卡片激活状态
+            actionsData.forEach((_, idx) => {
+                const card = document.getElementById(`card-${idx}`);
+                if (idx === currentActionIndex) {
+                    card.classList.add('eyecare-card-active');
+                } else {
+                    card.classList.remove('eyecare-card-active');
+                }
+            });
+
+            // 更新进度条
+            if (isFullRoutine) {
+                const totalDuration = actionsData.reduce((acc, a) => acc + a.duration, 0);
+                let elapsed = 0;
+                for (let i = 0; i < currentActionIndex; i++) {
+                    elapsed += actionsData[i].duration;
+                }
+                elapsed += (actionsData[currentActionIndex].duration - remainingTime);
+                const percent = Math.min(100, (elapsed / totalDuration) * 100);
+                document.getElementById('full-progress-bar').style.width = `${percent}%`;
+            }
+        }
+
+        function startFullRoutine() {
+            isFullRoutine = true;
+            currentActionIndex = 0;
+            remainingTime = actionsData[0].duration;
+            isPlaying = true;
+            isPaused = false;
+
+            document.getElementById('full-progress-container').classList.remove('hidden');
+            document.getElementById('main-play-btn').classList.add('opacity-50');
+            document.getElementById('pause-btn').disabled = false;
+
+            playHarmonicTone(523.25, 'sine', 0.6); // C5 音阶提示
+            updateActionUI();
+            startTimer();
+        }
+
+        function selectSingleAction(index) {
+            clearInterval(timerInterval);
+            isFullRoutine = false;
+            currentActionIndex = index;
+            remainingTime = actionsData[index].duration;
+            isPlaying = true;
+            isPaused = false;
+
+            document.getElementById('full-progress-container').classList.add('hidden');
+            document.getElementById('pause-btn').disabled = false;
+
+            playHarmonicTone(440, 'sine', 0.4);
+            updateActionUI();
+            startTimer();
+        }
+
+        function startTimer() {
+            clearInterval(timerInterval);
+            timerInterval = setInterval(() => {
+                if (!isPaused && isPlaying) {
+                    remainingTime--;
+                    updateActionUI();
+
+                    if (remainingTime <= 0) {
+                        if (isFullRoutine) {
+                            if (currentActionIndex < actionsData.length - 1) {
+                                currentActionIndex++;
+                                remainingTime = actionsData[currentActionIndex].duration;
+                                playHarmonicTone(587.33, 'sine', 0.5); // D5 切换音
+                                updateActionUI();
+                            } else {
+                                // 全套完成
+                                finishRoutine();
+                            }
+                        } else {
+                            // 单项完成
+                            finishRoutine();
+                        }
+                    }
+                }
+            }, 1000);
+        }
+
+        function togglePause() {
+            if (!isPlaying) return;
+            isPaused = !isPaused;
+            const pauseIcon = document.getElementById('pause-icon');
+            const pauseBtn = document.getElementById('pause-btn');
+
+            if (isPaused) {
+                pauseIcon.className = "fa-solid fa-play";
+                pauseBtn.innerHTML = '<i class="fa-solid fa-play"></i> 继续';
+            } else {
+                pauseIcon.className = "fa-solid fa-pause";
+                pauseBtn.innerHTML = '<i class="fa-solid fa-pause"></i> 暂停';
+            }
+        }
+
+        function resetExercise() {
+            clearInterval(timerInterval);
+            isPlaying = false;
+            isPaused = false;
+            isFullRoutine = false;
+            currentActionIndex = 0;
+            remainingTime = actionsData[0].duration;
+            animProgress = 0;
+
+            document.getElementById('full-progress-container').classList.add('hidden');
+            document.getElementById('main-play-btn').classList.remove('opacity-50');
+            document.getElementById('pause-btn').disabled = true;
+            document.getElementById('pause-btn').innerHTML = '<i class="fa-solid fa-pause"></i> 暂停';
+
+            updateActionUI();
+        }
+
+        function finishRoutine() {
+            clearInterval(timerInterval);
+            isPlaying = false;
+            playHarmonicTone(659.25, 'sine', 1.2); // E5 完成和弦
+            alertModal("恭喜！", "眼部放松操已完成，双眼是不是更加舒爽清亮了呢？");
+            resetExercise();
+        }
+
+        function updateSpeed(val) {
+            speedMultiplier = parseFloat(val);
+            document.getElementById('speed-val').innerText = `${speedMultiplier.toFixed(2)}x`;
+        }
+
+        // --- 5. 20-20-20 计时器逻辑 ---
+        let timer20Interval = null;
+        let time20Left = 20 * 60;
+        let is20Running = false;
+
+        function update20Display() {
+            const m = Math.floor(time20Left / 60).toString().padStart(2, '0');
+            const s = (time20Left % 60).toString().padStart(2, '0');
+            document.getElementById('timer-20-display').innerText = `${m}:${s}`;
+        }
+
+        function toggleTimer20() {
+            const btn = document.getElementById('btn-20-toggle');
+            if (is20Running) {
+                clearInterval(timer20Interval);
+                is20Running = false;
+                btn.innerText = "开启定时";
+            } else {
+                is20Running = true;
+                btn.innerText = "暂停";
+                timer20Interval = setInterval(() => {
+                    if (time20Left > 0) {
+                        time20Left--;
+                        update20Display();
+                    } else {
+                        clearInterval(timer20Interval);
+                        is20Running = false;
+                        document.getElementById('rest-alert-20').classList.remove('hidden');
+                        playHarmonicTone(880, 'triangle', 1.0);
+                        btn.innerText = "重新开启";
+                    }
+                }, 1000);
+            }
+        }
+
+        function resetTimer20() {
+            clearInterval(timer20Interval);
+            is20Running = false;
+            time20Left = 20 * 60;
+            update20Display();
+            document.getElementById('btn-20-toggle').innerText = "开启定时";
+            document.getElementById('rest-alert-20').classList.add('hidden');
+        }
+
+        // --- 6. 打卡与轻提示 ---
+        function checkInToday() {
+            const btn = document.getElementById('checkin-btn');
+            btn.innerText = "已打卡 ✓";
+            btn.classList.add('opacity-60');
+            btn.onclick = null;
+            playHarmonicTone(523.25, 'sine', 0.4);
+        }
+
+        function alertModal(title, msg) {
+            // 优雅替代原生 alert
+            const alertDiv = document.createElement('div');
+            alertDiv.className = 'fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm animate-fade-in';
+            alertDiv.innerHTML = `
+                <div class="eyecare-card p-6 rounded-2xl max-w-sm w-full text-center space-y-4 shadow-xl">
+                    <h3 class="text-lg font-bold">${title}</h3>
+                    <p class="text-xs opacity-80">${msg}</p>
+                    <button onclick="this.closest('.fixed').remove()" class="px-5 py-2 rounded-xl text-xs font-bold text-white" style="background-color: var(--accent-color)">
+                        好的，保持习惯
+                    </button>
+                </div>
+            `;
+            document.body.appendChild(alertDiv);
+        }
+
+        // --- 7. 初始化启动 ---
+        window.onload = function() {
+            const savedTheme = localStorage.getItem('eye_theme') || 'forest';
+            setTheme(savedTheme);
+            initCanvas();
+            updateActionUI();
+            update20Display();
+            drawFrame(); // 启动 60fps 渲染循环
+        };
+    </script>
+</body>
+</html>```
